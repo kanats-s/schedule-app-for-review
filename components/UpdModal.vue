@@ -69,18 +69,20 @@ export default {
   },
   methods:{
       eventDel: async function(){
-          const sfDocRef = doc(db, "events", String(this.id));
             try {
+                const sfDocRef = doc(db, "events", String(this.id));
                 await runTransaction(db, async (transaction) => {
                     const sfDoc = await transaction.get(sfDocRef);
                     if (!sfDoc.exists()) {
-                        throw "存在しない予定です";
+                        console.log('This data is not existed.');
+                    } else {
+                        transaction.delete(sfDocRef);
                     }
-                    transaction.delete(sfDocRef);
                 });
-                this.backToCalender();
             } catch (e) {
-                alert(e);
+                console.error('Failed to delete data,');
+                console.error(e);
+            } finally {
                 this.backToCalender();
             }
       },
@@ -95,25 +97,27 @@ export default {
                 months.push(String(moment(setMonth).format('YYYYMM')));
                 setMonth = moment(setMonth).add(1, 'month');
             }
-            const sfDocRef = doc(db, "events", String(this.id));
             try {
+                const sfDocRef = doc(db, "events", String(this.id));
                 await runTransaction(db, async (transaction) => {
                     const sfDoc = await transaction.get(sfDocRef);
                     if (!sfDoc.exists()) {
-                        throw "存在しない予定です";
+                        console.log('This data is not existed.');
+                    } else {
+                        transaction.update(sfDocRef, {
+                            title: this.title,
+                            start: Number(moment(this.start).format('YYYYMMDD')),
+                            end: Number(moment(this.end).format('YYYYMMDD')),
+                            color: this.color,
+                            months: months,
+                            memo: this.memo,
+                        });
                     }
-                    transaction.update(sfDocRef, {
-                        title: this.title,
-                        start: Number(moment(this.start).format('YYYYMMDD')),
-                        end: Number(moment(this.end).format('YYYYMMDD')),
-                        color: this.color,
-                        months: months,
-                        memo: this.memo,
-                    });
                 });
-                this.backToCalender();
             } catch (e) {
-                alert(e);
+                console.error('Failed to update data,');
+                console.error(e);
+            } finally {
                 this.backToCalender();
             }
         }else{

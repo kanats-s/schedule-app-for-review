@@ -68,29 +68,35 @@ export default {
   },
   methods:{
     eventAdd: async function(){
-      if(this.title !='' && this.start !='' && this.end !='' && this.color !=''){
-        let sDateOfMonth = moment(this.start).startOf('month');
-        let eDateOfMonth = moment(this.end).endOf('month');
-        let diffMonth = moment(eDateOfMonth).diff(moment(sDateOfMonth),'months');
-        let months =[];
-        let setMonth = sDateOfMonth;
-        for (let i = 0; i <= diffMonth; i++){
-            months.push(String(moment(setMonth).format('YYYYMM')));
-            setMonth = moment(setMonth).add(1, 'month');
+        if(this.title !='' && this.start !='' && this.end !='' && this.color !=''){
+            let sDateOfMonth = moment(this.start).startOf('month');
+            let eDateOfMonth = moment(this.end).endOf('month');
+            let diffMonth = moment(eDateOfMonth).diff(moment(sDateOfMonth),'months');
+            let months =[];
+            let setMonth = sDateOfMonth;
+            for (let i = 0; i <= diffMonth; i++){
+                months.push(String(moment(setMonth).format('YYYYMM')));
+                setMonth = moment(setMonth).add(1, 'month');
+            }
+            try {
+                const docRef = await addDoc(collection(db, 'events'), {
+                    title: this.title,
+                    start: Number(moment(this.start).format('YYYYMMDD')),
+                    end: Number(moment(this.end).format('YYYYMMDD')),
+                    color: this.color,
+                    months: months,
+                    memo: this.memo,
+                });
+            } catch(e) {
+                console.error('Failed to add data,');
+                console.error(e);
+            } finally {
+                this.closeModal();
+                this.$emit('reloadChalender');
+            }
+        }else{
+            alert('登録値を入力してください');
         }
-        const docRef = await addDoc(collection(db, 'events'), {
-            title: this.title,
-            start: Number(moment(this.start).format('YYYYMMDD')),
-            end: Number(moment(this.end).format('YYYYMMDD')),
-            color: this.color,
-            months: months,
-            memo: this.memo,
-        });
-        this.closeModal();
-        this.$emit('reloadChalender');
-      }else{
-        alert('登録値を入力してください');
-      }
     },
     openModal:function(){
       this.showContent = true;

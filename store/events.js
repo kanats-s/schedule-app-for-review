@@ -1,10 +1,9 @@
 import { db } from '~/plugins/firestore';
-import {collection, getDocs, addDoc, query, where} from 'firebase/firestore';
+import {collection, getDocs, query, where} from 'firebase/firestore';
 
 
 export const state = () => ({
-    events: [
-      ],
+    events: [],
 })
 
 export const getters = {
@@ -38,21 +37,31 @@ export const mutations = {
 
 export const actions = {
   async getEventListByMonth({ commit, state }, {months}){
-    const eventsRef = collection(db, 'events');
-    const q = query(eventsRef, where('months', 'array-contains-any', months));
-    const querySnapshot = await getDocs(q);
-    commit('initEvents');
-    querySnapshot.forEach((doc) => {
-      let id = doc.id;
-      commit('setEvents',{...doc.data(),id});
-    });
+    try {
+      const eventsRef = collection(db, 'events');
+      const q = query(eventsRef, where('months', 'array-contains-any', months));
+      const querySnapshot = await getDocs(q);
+      commit('initEvents');
+      querySnapshot.forEach((doc) => {
+        let id = doc.id;
+        commit('setEvents',{...doc.data(),id});
+      });
+    } catch(e) {
+      console.error('Failed to get data,');
+      console.error(e);
+    }
   },
   async getAllEventList({ commit, state }, {param}){
-    const querySnapshot = await getDocs(collection(db, 'events'));
-    commit('initEvents');
-    querySnapshot.forEach((doc) => {
-      let id = doc.id;
-      commit('setEvents',{...doc.data(),id});
-    });
+    try {
+      const querySnapshot = await getDocs(collection(db, 'events'));
+      commit('initEvents');
+      querySnapshot.forEach((doc) => {
+        let id = doc.id;
+        commit('setEvents',{...doc.data(),id});
+      });
+    } catch(e) {
+      console.error('Failed to get data,');
+      console.error(e);
+    }
   },
 }
