@@ -49,8 +49,8 @@
 
 <script>
 import moment from 'moment';
-import AddModal from '~/components/AddModal.vue';
-import UpdModal from '~/components/UpdModal.vue';
+import AddModal from '~/components/modals/AddModal.vue';
+import UpdModal from '~/components/modals/UpdModal.vue';
 
 export default {
     components: {
